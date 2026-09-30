@@ -11,7 +11,9 @@ Substitui o antigo demo em `granho.185.205.244.198.nip.io`.
 
 | | |
 |---|---|
-| **Domínio previsto** | `demo.gesgov.pt` (subdomínio; o gesgov.pt continua no OVH) |
+| **Domínio** | `demo.gesgov.pt` — **no ar desde 30/09/2026** (registo A na zona DNS da OVH → VPS `185.205.244.198`) |
+| **Servidor** | FastPanel, dono `demo_gesgov__usr`, pasta `/var/www/demo_gesgov__usr/data/www/demo.gesgov.pt` (clone git de `Ges-Gov/GesGov-DEMO`) |
+| **BD produção** | `demo_gesgov_` (utilizador `demo_gesgov_`) — **não** `gesgovdemo` |
 | **BD local** | `gesgovdemo` |
 | **Fonte do conteúdo** | gesgov.pt (recolhido a 30/09/2026) |
 | **Prefixo de denúncias/pedidos** | `DEMO-` |
@@ -64,7 +66,19 @@ Substitui o antigo demo em `granho.185.205.244.198.nip.io`.
   dá uma linha em branco — as descrições dos eventos têm quebras simples (as notícias, duplas).
 - Bug conhecido do CORE mantido: `index.php:1283` `Undefined array key "imagem"` (ver Caia).
 
+## Deploy (feito a 30/09/2026)
+
+- DNS: entrada **A** `demo` → `185.205.244.198` na zona DNS do `gesgov.pt` (OVH). Não há `www.demo`:
+  o alias `www.demo.gesgov.pt` que o FastPanel cria fez falhar o Let's Encrypt — o certificado foi
+  emitido só para `demo.gesgov.pt`.
+- Código por `git clone` (SSH, chave da conta Ges-Gov) na pasta do site; BD importada de
+  `deploy/gesgovdemo_migracoes.sql` (82 tabelas). Credenciais criadas à mão no servidor.
+- `deploy/.htaccess` bloqueia o `.sql` (403). O nginx servia o `.zip` diretamente — o ZIP foi
+  apagado no servidor. **Atualizar:** `cd` para a pasta do site e `git pull`.
+
 ## Por fazer
 
-- Registar o subdomínio e fazer o deploy (ver `deploy/LEIA-ME.md`).
+- Mudar a password do `admin` (herdada dos outros sites) antes de mostrar o backoffice.
+- Redirecionamento HTTP → HTTPS no FastPanel (em 30/09/2026 o `http://` ainda respondia 200).
+- Password de aplicação do email em `includes/mail_config.php` (para as confirmações de inscrição).
 - Documentos e assembleia de exemplo, se se quiser mostrar essas páginas preenchidas.
