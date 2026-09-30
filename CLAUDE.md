@@ -41,9 +41,10 @@ Substitui o antigo demo em `granho.185.205.244.198.nip.io`.
 | A Freguesia / História | Sobre Nós (quem somos, missão, visão, valores, porque apoio externo) + cronologia |
 | Heráldica | Identidade GesGov: logótipo, cores, a linha em Braille, missão e valores |
 | Notícias (9) | gesgov.pt › Info, texto integral, datas e imagens do site |
-| Eventos (8) | gesgov.pt › Agenda (CGA, SISAL, inauguração do CAME, 4 formações CCP/LCPA) |
+| Eventos (8) | gesgov.pt › Agenda (CGA, SISAL, inauguração do CAME, 4 formações CCP/LCPA), com as galerias de fotos de cada evento. As 4 formações têm **inscrições ativas** com os campos extra Entidade (obrigatório) e Cargo, como no formulário do gesgov.pt — para mostrar às Juntas que os eventos podem ter formulário |
 | Associações (50) | Autarquias parceiras, com o brasão/logótipo que o gesgov.pt mostra |
-| Comércio local (9) | Os serviços GesGov (gesgov.pt › Serviços) |
+| Comércio local (9) | Os serviços GesGov, com as imagens de gesgov.pt › Serviços |
+| Slider da página inicial | O mesmo do gesgov.pt (9 slides, mesmas imagens e textos); links para as páginas equivalentes deste site |
 | Pontos de interesse (2) | Escritório CAME (coordenadas do convite) e sede em Casa Branca (rua geocodificada) |
 | Contactos úteis | Sede, escritório e os 6 Links Úteis do gesgov.pt |
 | Assembleia, Documentos | Vazios — sem equivalente numa empresa |
@@ -59,6 +60,8 @@ Substitui o antigo demo em `granho.185.205.244.198.nip.io`.
   Excluído `admin/relatorio-pdf.php` (o dompdf não suporta variáveis CSS).
 - `admin/login.php` passa a imprimir `temaVariaveisCss()` no `:root` (antes não tinha as
   variáveis do tema; o botão ficava sempre dourado).
+- Nota do CORE: o `evento.php` usa `nl2br` **e** `white-space:pre-line`, por isso cada `\n` já
+  dá uma linha em branco — as descrições dos eventos têm quebras simples (as notícias, duplas).
 - Bug conhecido do CORE mantido: `index.php:1283` `Undefined array key "imagem"` (ver Caia).
 
 ## Por fazer
