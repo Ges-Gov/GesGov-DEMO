@@ -8896,3 +8896,115 @@ a:hover{
     cursor:pointer;
 }
 
+
+
+/* CABEÇALHO LIMPO (07/10/2026) — sem barra de contactos no topo nem faixa de pesquisa:
+   o slider fica logo a seguir ao menu. A pesquisa abre pela lupa, à esquerda de «Início»
+   (no telemóvel, ao lado do ☰), num painel por cima do conteúdo. */
+.main-nav{
+    align-items:center;
+}
+
+.nav-search-toggle,
+.mobile-search-toggle{
+    background:none;
+    border:0;
+    margin:0;
+    padding:7px;
+    border-radius:999px;
+    color:#1f2933;
+    font-size:18px;
+    line-height:1;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    transition:color .2s ease, background .2s ease;
+}
+
+.nav-search-toggle:hover,
+.mobile-search-toggle:hover,
+.nav-search-toggle[aria-expanded="true"],
+.mobile-search-toggle[aria-expanded="true"]{
+    color:var(--cor-principal);
+    background:color-mix(in srgb, var(--cor-principal) 10%, transparent);
+}
+
+.nav-search-toggle:focus-visible,
+.mobile-search-toggle:focus-visible,
+.global-search-close:focus-visible{
+    outline:2px solid var(--cor-principal);
+    outline-offset:2px;
+}
+
+.mobile-search-toggle{
+    display:none;
+}
+
+.global-search-panel{
+    position:absolute;
+    top:100%;
+    left:0;
+    right:0;
+    background:#fff;
+    border-top:1px solid #edf2f7;
+    padding:18px 0 22px;
+    box-shadow:0 18px 30px rgba(15,23,42,.12);
+    z-index:60;
+}
+
+.global-search-panel[hidden]{
+    display:none;
+}
+
+.global-search-panel .global-search-box{
+    border:1px solid #e2e8f0;
+}
+
+.global-search-close{
+    background:none;
+    border:0;
+    padding:6px;
+    border-radius:999px;
+    color:#64748b;
+    font-size:15px;
+    cursor:pointer;
+    display:inline-flex;
+    flex-shrink:0;
+}
+
+.global-search-close:hover{
+    color:#11151B;
+}
+
+@media (max-width: 850px){
+    .nav-search-toggle{
+        display:none;
+    }
+
+    .mobile-search-toggle{
+        display:inline-flex;
+        margin-left:auto;
+        margin-right:6px;
+        font-size:20px;
+    }
+
+    /* o bloco do logótipo encolhe para a lupa e o ☰ caberem sempre no ecrã */
+    .header-inner .brand{
+        flex:1 1 auto;
+        min-width:0;
+    }
+
+    .header-inner .brand > div{
+        min-width:0;
+    }
+
+    .header-inner .brand img{
+        height:52px !important;   /* o logótipo tem 78px inline — no telemóvel ocupa demasiado */
+    }
+
+    .mobile-search-toggle,
+    .menu-toggle{
+        flex-shrink:0;
+    }
+}
