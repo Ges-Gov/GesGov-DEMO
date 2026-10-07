@@ -8901,10 +8901,6 @@ a:hover{
 /* CABEÇALHO LIMPO (07/10/2026) — sem barra de contactos no topo nem faixa de pesquisa:
    o slider fica logo a seguir ao menu. A pesquisa abre pela lupa, à esquerda de «Início»
    (no telemóvel, ao lado do ☰), num painel por cima do conteúdo. */
-.main-nav{
-    align-items:center;
-}
-
 .nav-search-toggle,
 .mobile-search-toggle{
     background:none;
@@ -8939,6 +8935,19 @@ a:hover{
 
 .mobile-search-toggle{
     display:none;
+}
+
+/* Alinhamento do menu pelo topo: os botões com submenu («A Freguesia ▾»…) têm 12px de
+   padding por baixo (ponte para o rato chegar ao submenu); centrados, subiam 6px em relação
+   a «Início» e «Contactos». A lupa tem a altura de uma linha de texto para não esticar o menu. */
+.main-nav{
+    align-items:flex-start;
+}
+
+.main-nav .nav-search-toggle{
+    padding:0 4px;
+    height:1.25em;
+    font-size:17px;
 }
 
 .global-search-panel{
