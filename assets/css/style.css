@@ -8937,6 +8937,19 @@ a:hover{
     display:none;
 }
 
+/* Cabeçalho mais baixo: o logótipo tem height:78px escrito no HTML — aqui fica em 56px. */
+.main-header{
+    padding:10px 0;
+}
+
+.header-inner .brand img{
+    height:56px !important;
+}
+
+.header-inner .brand strong{
+    font-size:17px;
+}
+
 /* Alinhamento do menu pelo topo: os botões com submenu («A Freguesia ▾»…) têm 12px de
    padding por baixo (ponte para o rato chegar ao submenu); centrados, subiam 6px em relação
    a «Início» e «Contactos». A lupa tem a altura de uma linha de texto para não esticar o menu. */
@@ -9008,8 +9021,30 @@ a:hover{
         min-width:0;
     }
 
+    .main-header{
+        padding:8px 0;
+    }
+
+    .header-inner .brand{
+        gap:10px;
+    }
+
     .header-inner .brand img{
-        height:52px !important;   /* o logótipo tem 78px inline — no telemóvel ocupa demasiado */
+        height:40px !important;
+    }
+
+    /* nome no máximo em 2 linhas; o subtítulo (município) só no computador */
+    .header-inner .brand strong{
+        font-size:14px;
+        line-height:1.25;
+        display:-webkit-box;
+        -webkit-line-clamp:2;
+        -webkit-box-orient:vertical;
+        overflow:hidden;
+    }
+
+    .header-inner .brand small{
+        display:none;
     }
 
     .mobile-search-toggle,
