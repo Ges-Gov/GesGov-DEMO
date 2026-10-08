@@ -9052,3 +9052,18 @@ a:hover{
         flex-shrink:0;
     }
 }
+
+/* Nomes de Junta compridos: acima de 1200px os itens do menu não partem em duas linhas
+   («A / Freguesia»); quem encolhe é o nome da Junta. */
+@media (min-width: 1200px){
+    .main-nav > a,
+    .main-nav .nav-parent{
+        white-space:nowrap;
+    }
+
+    .header-inner .brand{
+        flex:1 1 auto;
+        min-width:0;
+        margin-right:24px;
+    }
+}
