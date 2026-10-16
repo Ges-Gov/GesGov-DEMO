@@ -1,4 +1,9 @@
 <?php
+/*
+ * Plataforma de sites de Juntas de Freguesia — © 2026 GesGov. Todos os direitos reservados.
+ * Licença GG-GESGOVDEMO-53CC2849 — uso exclusivo de: GesGov (site de demonstração).
+ * Proibida a cópia, modificação, redistribuição ou venda sem autorização escrita da GesGov.
+ */
 session_start();
 
 if (!isset($_SESSION['admin'])) {

@@ -1,4 +1,9 @@
 <?php
+/*
+ * Plataforma de sites de Juntas de Freguesia — © 2026 GesGov. Todos os direitos reservados.
+ * Licença GG-GESGOVDEMO-53CC2849 — uso exclusivo de: GesGov (site de demonstração).
+ * Proibida a cópia, modificação, redistribuição ou venda sem autorização escrita da GesGov.
+ */
 // Output buffering: permite que header("Location: ...") funcione mesmo depois
 // de a página começar a ser impressa (evita "headers already sent").
 // Incondicional — o buffer padrão de 4KB esvaziava ao ser excedido.
@@ -37,6 +42,10 @@ if (!empty($_SESSION['cidadao_id'])) {
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
+    <meta name="author" content="GesGov">
+    <meta name="generator" content="Plataforma Juntas GesGov">
+    <meta name="copyright" content="© 2026 GesGov — software licenciado (GG-GESGOVDEMO-53CC2849)">
+    <!-- Software © 2026 GesGov — todos os direitos reservados — licença GG-GESGOVDEMO-53CC2849 -->
     <?php
         // Título e descrição para SEO: usa os da página (se definidos), senão os do site.
         $tituloPagina = !empty($meta_titulo)
