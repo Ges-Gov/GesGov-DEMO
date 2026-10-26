@@ -1,44 +1,91 @@
 <?php require_once "includes/header.php"; ?>
 
 <?php
-$porPagina = 8;
-$pagina = isset($_GET['pagina']) ? max(1, (int)$_GET['pagina']) : 1;
-$offset = ($pagina - 1) * $porPagina;
+// O "tipo" é texto livre ("Restaurante / Café", "Café / Snack-Bar"...): cada
+// estabelecimento entra em todas as categorias cujas palavras aparecem no tipo.
+$categoriasComercio = [
+    'restaurantes' => ['Restaurantes', 'bi-egg-fried', ['restaurante', 'marisqueira', 'churrasqueira', 'tasca', 'pizzaria', 'grelhados', 'cervejaria']],
+    'cafes'        => ['Cafés', 'bi-cup-hot-fill', ['café', 'cafe', 'cafetaria', 'snack']],
+    'bares'        => ['Bares', 'bi-cup-straw', ['bar', 'pub', 'discoteca', 'wine bar']],
+    'padarias'     => ['Padarias e Pastelarias', 'bi-basket2-fill', ['padaria', 'pastelaria', 'confeitaria']],
+    'alojamento'   => ['Alojamento', 'bi-house-heart-fill', ['hotel', 'alojamento', 'turismo', 'hostel', 'residencial', 'pousada', 'guest house']],
+    'mercearias'   => ['Mercearias e Supermercados', 'bi-cart-fill', ['mercearia', 'supermercado', 'minimercado', 'mini-mercado', 'talho', 'frutaria']],
+    'farmacias'    => ['Farmácias', 'bi-capsule', ['farmácia', 'farmacia', 'parafarmácia']],
+];
+$categoriaOutros = ['Outros', 'bi-shop'];
 
-$total = (int)$pdo->query("SELECT COUNT(*) FROM comercio_local")->fetchColumn();
-$totalPaginas = max(1, ceil($total / $porPagina));
-
-$stmt = $pdo->prepare("
-    SELECT *
-    FROM comercio_local
-    ORDER BY nome ASC
-    LIMIT ? OFFSET ?
-");
-
-$stmt->bindValue(1, $porPagina, PDO::PARAM_INT);
-$stmt->bindValue(2, $offset, PDO::PARAM_INT);
-$stmt->execute();
-
-$comercio = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$heroImagem = !empty($comercio[0]['imagem'])
-    ? "/assets/img/" . $comercio[0]['imagem']
-    : "/assets/img/freguesia-1.jpg";
+function categoriasDoTipo($tipo, $categorias)
+{
+    $t = str_replace('snack-bar', 'snack', mb_strtolower((string)$tipo));
+    $encontradas = [];
+    foreach ($categorias as $chave => $cat) {
+        foreach ($cat[2] as $palavra) {
+            if (preg_match('/(^|[^\p{L}])' . preg_quote($palavra, '/') . 's?([^\p{L}]|$)/u', $t)) {
+                $encontradas[] = $chave;
+                break;
+            }
+        }
+    }
+    return $encontradas ?: ['outros'];
+}
 
 function comercioIcon($tipo)
 {
-    $tipo = mb_strtolower($tipo);
-
-    if (str_contains($tipo, 'padaria')) return '<i class="bi bi-basket2-fill"></i>';
-    if (str_contains($tipo, 'café')) return '<i class="bi bi-cup-hot-fill"></i>';
-    if (str_contains($tipo, 'restaurante')) return '<i class="bi bi-egg-fried"></i>';
-    if (str_contains($tipo, 'mercearia')) return '<i class="bi bi-bag-fill"></i>';
-    if (str_contains($tipo, 'pastelaria')) return '<i class="bi bi-cake2-fill"></i>';
-    if (str_contains($tipo, 'mini')) return '<i class="bi bi-cart-fill"></i>';
-    if (str_contains($tipo, 'turismo') || str_contains($tipo, 'rural')) return '<i class="bi bi-tree-fill"></i>';
-
-    return '<i class="bi bi-shop"></i>';
+    global $categoriasComercio, $categoriaOutros;
+    $chave = categoriasDoTipo($tipo, $categoriasComercio)[0];
+    $icone = $categoriasComercio[$chave][1] ?? $categoriaOutros[1];
+    return '<i class="bi ' . $icone . '"></i>';
 }
+
+$todosComercio = $pdo->query("SELECT * FROM comercio_local ORDER BY nome ASC")->fetchAll(PDO::FETCH_ASSOC);
+seoComercio($todosComercio);   // schema.org LocalBusiness (includes/seo.php)
+$total = count($todosComercio);
+
+$contagemCategorias = [];
+foreach ($todosComercio as &$c) {
+    $c['_categorias'] = categoriasDoTipo($c['tipo'] ?? '', $categoriasComercio);
+    foreach ($c['_categorias'] as $k) {
+        $contagemCategorias[$k] = ($contagemCategorias[$k] ?? 0) + 1;
+    }
+}
+unset($c);
+
+$filtrosDisponiveis = [];
+foreach ($categoriasComercio as $chave => $cat) {
+    if (!empty($contagemCategorias[$chave])) {
+        $filtrosDisponiveis[$chave] = [$cat[0], $cat[1], $contagemCategorias[$chave]];
+    }
+}
+if (!empty($contagemCategorias['outros'])) {
+    $filtrosDisponiveis['outros'] = [$categoriaOutros[0], $categoriaOutros[1], $contagemCategorias['outros']];
+}
+
+$categoriaAtual = $_GET['categoria'] ?? '';
+if (!isset($filtrosDisponiveis[$categoriaAtual])) {
+    $categoriaAtual = '';
+}
+
+$filtrados = $categoriaAtual === ''
+    ? $todosComercio
+    : array_values(array_filter($todosComercio, fn($c) => in_array($categoriaAtual, $c['_categorias'], true)));
+$totalFiltrados = count($filtrados);
+
+$porPagina = 8;
+$totalPaginas = max(1, (int)ceil($totalFiltrados / $porPagina));
+$pagina = isset($_GET['pagina']) ? min($totalPaginas, max(1, (int)$_GET['pagina'])) : 1;
+$comercio = array_slice($filtrados, ($pagina - 1) * $porPagina, $porPagina);
+
+function urlComercio($categoria, $pagina = 1)
+{
+    $q = [];
+    if ($categoria !== '') $q['categoria'] = $categoria;
+    if ($pagina > 1) $q['pagina'] = $pagina;
+    return '/comercio.php' . ($q ? '?' . http_build_query($q) : '') . '#comercio-lista';
+}
+
+$heroImagem = !empty($todosComercio[0]['imagem'])
+    ? "/assets/img/" . $todosComercio[0]['imagem']
+    : "/assets/img/freguesia-1.jpg";
 ?>
 
 <style>
@@ -95,9 +142,9 @@ function comercioIcon($tipo)
     display:inline-flex;
     align-items:center;
     gap:9px;
-    background:color-mix(in srgb, var(--tema-acento, #D4AA00) 15%, transparent);
-    border:1px solid color-mix(in srgb, var(--tema-acento, #D4AA00) 42%, transparent);
-    color:var(--tema-kicker-img-texto, #F0D060);
+    background:rgb(var(--ouro-rgb, 240 180 41) / .15);
+    border:1px solid rgb(var(--ouro-rgb, 240 180 41) / .42);
+    color:var(--ouro-claro, #f8d77a);
     border-radius:999px;
     padding:10px 16px;
     font-size:13px;
@@ -135,7 +182,7 @@ function comercioIcon($tipo)
 
 .comercio-hero-stat strong{
     display:block;
-    color:var(--tema-acento, #D4AA00);
+    color:var(--ouro, #C8A02E);
     font-size:56px;
     line-height:1;
     margin-bottom:8px;
@@ -273,7 +320,7 @@ function comercioIcon($tipo)
     height:100%;
     display:grid;
     place-items:center;
-    color:var(--tema-acento, #D4AA00);
+    color:var(--ouro, #C8A02E);
     font-size:74px;
     font-weight:900;
 }
@@ -339,6 +386,12 @@ function comercioIcon($tipo)
 .comercio-info strong{
     color:#11151B;
 }
+/* 15/10/2026: rótulo por cima do valor — lado a lado, o rótulo encolhia e partia («Morad / a:») */
+.comercio-info{ flex-direction:column; gap:2px; }
+.comercio-info strong{ display:inline-flex; align-items:center; gap:6px; white-space:nowrap; font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#64748b; }
+.comercio-info strong .bi{ color:var(--cor-principal); font-size:12px; }
+.comercio-info span{ color:#1e293b; overflow-wrap:anywhere; }
+:root[data-tema="escuro"] .comercio-info strong{ color:#94a3b8; } :root[data-tema="escuro"] .comercio-info span{ color:#e2e8f0; }
 
 .comercio-divider{
     height:1px;
@@ -367,7 +420,7 @@ function comercioIcon($tipo)
 }
 
 .comercio-contact-btn:hover{
-    color:var(--tema-acento, #D4AA00);
+    color:var(--ouro, #C8A02E);
 }
 
 .comercio-pagination{
@@ -434,11 +487,22 @@ function comercioIcon($tipo)
 
 @media(max-width:760px){
     .comercio-hero-insane{
-        min-height:560px;
+        min-height:400px;
     }
 
     .comercio-hero-inner{
-        padding:70px 0 120px;
+        padding:50px 0 90px;
+    }
+
+    .comercio-hero-insane h1{
+        font-size:clamp(28px,8vw,40px);
+        letter-spacing:-1px;
+    }
+
+    .comercio-hero-insane p{
+        font-size:15px;
+        line-height:1.5;
+        margin:0 0 20px;
     }
 
     .comercio-main{
@@ -497,16 +561,59 @@ function comercioIcon($tipo)
 
 
 
-.filtro-comercio{
-    cursor:pointer;
-    user-select:none;
+.comercio-tabs a.filtro-comercio{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:#f8fafc;
+    border:1px solid #e5e7eb;
+    color:#334155;
+    padding:10px 15px;
+    border-radius:999px;
+    font-weight:800;
+    font-size:13px;
+    text-decoration:none;
     transition:.2s ease;
 }
 
-.filtro-comercio:hover{
-    transform:translateY(-2px);
-    background:#eef2ff;
-    color:#242A30;
+.comercio-tabs a.filtro-comercio small{
+    background:#e2e8f0;
+    color:#475569;
+    border-radius:999px;
+    padding:2px 8px;
+    font-size:11px;
+    font-weight:900;
+}
+
+.comercio-tabs a.filtro-comercio:hover{
+    border-color:var(--cor-principal);
+    color:var(--cor-principal);
+}
+
+.comercio-tabs a.filtro-comercio.active{
+    background:var(--cor-principal);
+    border-color:var(--cor-principal);
+    color:#fff;
+}
+
+.comercio-tabs a.filtro-comercio.active small{
+    background:rgba(255,255,255,.22);
+    color:#fff;
+}
+
+@media(max-width:760px){
+    .comercio-tabs{
+        flex-wrap:nowrap;
+        overflow-x:auto;
+        gap:8px;
+        padding-bottom:6px;
+        margin:0 -4px;
+        scrollbar-width:none;
+        -webkit-overflow-scrolling:touch;
+    }
+    .comercio-tabs::-webkit-scrollbar{ display:none; }
+    .comercio-tabs a.filtro-comercio{ flex:0 0 auto; padding:8px 12px; }
+    .comercio-count{ font-size:14px; padding:9px 14px; }
 }
 
 
@@ -519,23 +626,23 @@ function comercioIcon($tipo)
         <div class="container">
             <div class="comercio-hero-inner">
                 <div>
-                    <span class="comercio-kicker">Economia Local</span>
-                    <h1>Economia Local</h1>
+                    <span class="comercio-kicker"><?= te('comercio.hero.kicker') ?></span>
+                    <h1><?= te('comercio.hero.titulo') ?></h1>
                     <p>
-                        Descubra estabelecimentos, serviços, cafés, restaurantes
-                        e negócios locais. Apoie quem está perto de si.
+                        <?= te('comercio.hero.texto') ?>
+
                     </p>
                 </div>
 
                 <aside class="comercio-hero-stat">
                     <strong><?= (int)$total ?></strong>
-                    <span>estabelecimentos publicados</span>
+                    <span><?= te('comercio.hero.contagem') ?></span>
                 </aside>
             </div>
         </div>
     </section>
 
-    <section class="container comercio-main">
+    <section class="container comercio-main" data-zona-ajax="comercio">
 
         <div class="comercio-intro-panel">
             
@@ -547,29 +654,27 @@ function comercioIcon($tipo)
 
 
 
-<div class="comercio-tabs">
-
-    <span class="active filtro-comercio" data-filtro="todos">
-        <i class="bi bi-shop"></i> Todos
-    </span>
-
-    <span class="filtro-comercio" data-filtro="restaurante">
-        <i class="bi bi-egg-fried"></i> Restaurantes
-    </span>
-
-    <span class="filtro-comercio" data-filtro="café">
-        <i class="bi bi-cup-hot-fill"></i> Cafés
-    </span>
-
-    <span class="filtro-comercio" data-filtro="comércio">
-        <i class="bi bi-cart-fill"></i> Comércio
-    </span>
-
-    <span class="filtro-comercio" data-filtro="turismo">
-        <i class="bi bi-tree-fill"></i> Turismo Rural
-    </span>
-
-</div>
+<?php if (count($filtrosDisponiveis) > 1): ?>
+<nav class="comercio-tabs" aria-label="Filtrar por tipo de estabelecimento">
+    <a href="<?= urlComercio('') ?>" class="filtro-comercio<?= $categoriaAtual === '' ? ' active' : '' ?>">
+        <i class="bi bi-grid-fill"></i> <?= te('comercio.filtros.todos') ?> <small><?= (int)$total ?></small>
+    </a>
+    <?php foreach ($filtrosDisponiveis as $chave => $f): ?>
+        <a href="<?= urlComercio($chave) ?>" class="filtro-comercio<?= $categoriaAtual === $chave ? ' active' : '' ?>">
+            <i class="bi <?= $f[1] ?>"></i> <?= htmlspecialchars($f[0]) ?> <small><?= (int)$f[2] ?></small>
+        </a>
+    <?php endforeach; ?>
+</nav>
+<script>
+(function () {
+    var nav = document.querySelector('.comercio-tabs');
+    var ativo = nav && nav.querySelector('.filtro-comercio.active');
+    if (ativo && nav.scrollWidth > nav.clientWidth) {
+        nav.scrollLeft = ativo.offsetLeft - nav.offsetLeft - 16;
+    }
+})();
+</script>
+<?php endif; ?>
 
 
 
@@ -581,17 +686,17 @@ function comercioIcon($tipo)
 
 
             <div class="comercio-count">
-                <?= (int)$total ?> estabelecimento<?= (int)$total === 1 ? '' : 's' ?> registado<?= (int)$total === 1 ? '' : 's' ?>
+                <?= (int)$totalFiltrados ?> estabelecimento<?= (int)$totalFiltrados === 1 ? '' : 's' ?><?= $categoriaAtual !== '' ? ' em ' . htmlspecialchars(mb_strtolower($filtrosDisponiveis[$categoriaAtual][0])) : ' registado' . ((int)$totalFiltrados === 1 ? '' : 's') ?>
             </div>
         </div>
 
-        <div class="comercio-section-head">
+        <div class="comercio-section-head" id="comercio-lista">
             <div>
-                <span class="comercio-kicker">Economia local</span>
-                <h2>O nosso comércio</h2>
+                <span class="comercio-kicker"><?= te('comercio.lista.kicker') ?></span>
+                <h2><?= te('comercio.lista.titulo') ?></h2>
             </div>
 
-            <p>Negócios e serviços que dão vida à freguesia.</p>
+            <p><?= te('comercio.lista.texto') ?></p>
         </div>
 
         <?php if (!empty($comercio)): ?>
@@ -600,9 +705,7 @@ function comercioIcon($tipo)
 
                 <?php foreach ($comercio as $c): ?>
 
-                    <article
-    class="comercio-card-insane"
-    data-tipo="<?= mb_strtolower(trim($c['tipo'])) ?>">
+                    <article class="comercio-card-insane">
 
                         <div class="comercio-image">
                             <span class="comercio-type-float">
@@ -628,35 +731,35 @@ function comercioIcon($tipo)
 
                             <?php if (!empty($c['morada'])): ?>
                                 <div class="comercio-info">
-                                    <strong><i class="bi bi-geo-alt-fill"></i> Morada:</strong>
+                                    <strong><i class="bi bi-geo-alt-fill"></i> <?= te('comercio.lista.morada') ?></strong>
                                     <span><?= nl2br(htmlspecialchars($c['morada'])) ?></span>
                                 </div>
                             <?php endif; ?>
 
                             <?php if (!empty($c['telefone'])): ?>
                                 <div class="comercio-info">
-                                    <strong><i class="bi bi-telephone-fill"></i> Telefone:</strong>
+                                    <strong><i class="bi bi-telephone-fill"></i> <?= te('comercio.lista.telefone') ?></strong>
                                     <span><?= htmlspecialchars($c['telefone']) ?></span>
                                 </div>
                             <?php endif; ?>
 
                             <?php if (!empty($c['email'])): ?>
                                 <div class="comercio-info">
-                                    <strong><i class="bi bi-envelope-fill"></i> Email:</strong>
+                                    <strong><i class="bi bi-envelope-fill"></i> <?= te('comercio.lista.email') ?></strong>
                                     <span><?= htmlspecialchars($c['email']) ?></span>
                                 </div>
                             <?php endif; ?>
 
                             <?php if (!empty($c['website'])): ?>
                                 <div class="comercio-info">
-                                    <strong><i class="bi bi-globe"></i> Website:</strong>
+                                    <strong><i class="bi bi-globe"></i> <?= te('comercio.lista.website') ?></strong>
                                     <span><a href="<?= htmlspecialchars($c['website']) ?>" target="_blank" rel="noopener"><?= htmlspecialchars($c['website']) ?></a></span>
                                 </div>
                             <?php endif; ?>
 
                             <?php if (!empty($c['outros_contactos'])): ?>
                                 <div class="comercio-info">
-                                    <strong><i class="bi bi-info-circle-fill"></i> Outros contactos:</strong>
+                                    <strong><i class="bi bi-info-circle-fill"></i> <?= te('comercio.lista.outros') ?></strong>
                                     <span><?= nl2br(htmlspecialchars($c['outros_contactos'])) ?></span>
                                 </div>
                             <?php endif; ?>
@@ -664,13 +767,13 @@ function comercioIcon($tipo)
                             <div class="comercio-actions">
                                 <?php if (!empty($c['telefone'])): ?>
                                     <a href="tel:<?= htmlspecialchars($c['telefone']) ?>" class="comercio-contact-btn">
-                                        <i class="bi bi-telephone-fill"></i> Ligar
+                                        <i class="bi bi-telephone-fill"></i> <?= te('comercio.lista.ligar') ?>
                                     </a>
                                 <?php endif; ?>
 
                                 <?php if (!empty($c['email'])): ?>
                                     <a href="mailto:<?= htmlspecialchars($c['email']) ?>" class="comercio-contact-btn">
-                                        <i class="bi bi-envelope-fill"></i> Contactar
+                                        <i class="bi bi-envelope-fill"></i> <?= te('comercio.lista.contactar') ?>
                                     </a>
                                 <?php endif; ?>
 
@@ -688,11 +791,11 @@ function comercioIcon($tipo)
 
                                 <?php if (!empty($c['latitude']) && !empty($c['longitude'])): ?>
                                     <a href="https://www.google.com/maps?q=<?= htmlspecialchars($c['latitude']) ?>,<?= htmlspecialchars($c['longitude']) ?>" target="_blank" rel="noopener" class="comercio-contact-btn">
-                                        <i class="bi bi-geo-alt-fill"></i> Ver no mapa
+                                        <i class="bi bi-geo-alt-fill"></i> <?= te('comercio.lista.mapa') ?>
                                     </a>
                                 <?php elseif (!empty($c['morada'])): ?>
                                     <a href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($c['nome'] . ' ' . $c['morada']) ?>" target="_blank" rel="noopener" class="comercio-contact-btn">
-                                        <i class="bi bi-geo-alt-fill"></i> Ver no mapa
+                                        <i class="bi bi-geo-alt-fill"></i> <?= te('comercio.lista.mapa') ?>
                                     </a>
                                 <?php endif; ?>
                             </div>
@@ -710,12 +813,12 @@ function comercioIcon($tipo)
                 <div class="comercio-pagination">
 
                     <?php if ($pagina > 1): ?>
-                        <a href="?pagina=<?= $pagina - 1 ?>">‹</a>
+                        <a href="<?= urlComercio($categoriaAtual, $pagina - 1) ?>">‹</a>
                     <?php endif; ?>
 
                     <?php for ($i = 1; $i <= $totalPaginas; $i++): ?>
 
-                        <a href="?pagina=<?= $i ?>"
+                        <a href="<?= urlComercio($categoriaAtual, $i) ?>"
                            class="<?= $i === $pagina ? 'active' : '' ?>">
                             <?= $i ?>
                         </a>
@@ -723,7 +826,7 @@ function comercioIcon($tipo)
                     <?php endfor; ?>
 
                     <?php if ($pagina < $totalPaginas): ?>
-                        <a href="?pagina=<?= $pagina + 1 ?>">›</a>
+                        <a href="<?= urlComercio($categoriaAtual, $pagina + 1) ?>">›</a>
                     <?php endif; ?>
 
                 </div>
@@ -733,7 +836,7 @@ function comercioIcon($tipo)
         <?php else: ?>
 
             <div class="comercio-empty">
-                Ainda não existem estabelecimentos publicados.
+                <?= te('comercio.vazio.texto') ?>
             </div>
 
         <?php endif; ?>
@@ -756,50 +859,7 @@ function comercioIcon($tipo)
 
 
 
-<script>
 
-document.addEventListener('DOMContentLoaded', function(){
-
-    const filtros = document.querySelectorAll('.filtro-comercio');
-    const cards = document.querySelectorAll('.comercio-card-insane');
-
-    filtros.forEach(btn => {
-
-        btn.addEventListener('click', function(){
-
-            filtros.forEach(f =>
-                f.classList.remove('active')
-            );
-
-            this.classList.add('active');
-
-            const filtro =
-                this.dataset.filtro.toLowerCase();
-
-            cards.forEach(card => {
-
-                const tipo =
-                    card.dataset.tipo.toLowerCase();
-
-                if(filtro === 'todos'){
-                    card.style.display = '';
-                }
-                else{
-                    card.style.display =
-                        tipo.includes(filtro)
-                        ? ''
-                        : 'none';
-                }
-
-            });
-
-        });
-
-    });
-
-});
-
-</script>
 
 
 

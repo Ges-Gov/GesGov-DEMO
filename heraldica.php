@@ -4,10 +4,10 @@
 $heraldica = [
     'hero_kicker' => 'Heráldica',
     'hero_titulo' => 'Heráldica',
-    'hero_subtitulo' => 'Logótipo, cores e elementos da identidade GesGov.',
-    'titulo' => 'Identidade GesGov',
-    'texto_intro' => 'O logótipo da GesGov junta o azul institucional e o cinzento, as cores da empresa desde a sua fundação, em 2024.',
-    'imagem' => 'logo-gesgov.png',
+    'hero_subtitulo' => 'Brasão, bandeira e elementos simbólicos da Freguesia ' . deFreguesia() . '.',
+    'titulo' => 'Brasão da Freguesia ' . deFreguesia(),
+    'texto_intro' => '',
+    'imagem' => '',
     'fonte_texto' => '',
     'fonte_url' => ''
 ];
@@ -28,13 +28,13 @@ function hTxt($txt) {
     return nl2br(htmlspecialchars($txt ?? ''));
 }
 
-$img = !empty($heraldica['imagem']) ? "/uploads/heraldica/" . htmlspecialchars($heraldica['imagem']) : "/assets/img/heraldica-granho.webp";
+$img = !empty($heraldica['imagem']) ? "/uploads/heraldica/" . htmlspecialchars($heraldica['imagem']) : (siteConfig('logo') ? "/assets/img/" . htmlspecialchars(siteConfig('logo')) : "/assets/img/freguesia-1.jpg");   // sem imagem própria: o brasão/logótipo das Configurações
 ?>
 
 <style>
 .heraldica-hero{
     background:
-        radial-gradient(circle at 15% 18%, color-mix(in srgb, var(--tema-acento, #D4AA00) 26%, transparent), transparent 30%),
+        radial-gradient(circle at 15% 18%, rgb(var(--ouro-rgb, 240 180 41) / .26), transparent 30%),
         radial-gradient(circle at 90% 12%, rgba(255,255,255,.12), transparent 30%),
         linear-gradient(135deg,#242A30,#11151B 65%,#071c2e);
     color:white;
@@ -55,9 +55,9 @@ $img = !empty($heraldica['imagem']) ? "/uploads/heraldica/" . htmlspecialchars($
 .heraldica-hero .container{position:relative;z-index:2;}
 .heraldica-kicker{
     display:inline-flex;
-    background:color-mix(in srgb, var(--tema-acento, #D4AA00) 16%, transparent);
-    border:1px solid color-mix(in srgb, var(--tema-acento, #D4AA00) 38%, transparent);
-    color:var(--tema-kicker-img-texto, #F0D060);
+    background:rgb(var(--ouro-rgb, 240 180 41) / .16);
+    border:1px solid rgb(var(--ouro-rgb, 240 180 41) / .38);
+    color:var(--ouro-claro, #f8d77a);
     padding:9px 14px;
     border-radius:999px;
     font-weight:900;
@@ -76,6 +76,10 @@ $img = !empty($heraldica['imagem']) ? "/uploads/heraldica/" . htmlspecialchars($
     font-size:20px;
     line-height:1.75;
     margin:0;
+}
+@media(max-width:700px){
+    .heraldica-hero h1{font-size:clamp(26px,7vw,38px);letter-spacing:-1px;}
+    .heraldica-hero p{font-size:15px;line-height:1.5;}
 }
 .heraldica-shell{margin-top:-52px;position:relative;z-index:5;}
 .heraldica-main{
@@ -191,7 +195,7 @@ $img = !empty($heraldica['imagem']) ? "/uploads/heraldica/" . htmlspecialchars($
 
         <div class="heraldica-main">
             <div class="heraldica-img-card">
-                <img src="<?= $img ?>" alt="Logótipo GesGov">
+                <img src="<?= $img ?>" alt="Brasão de <?= htmlspecialchars(nomeFreguesia()) ?>">
             </div>
 
             <div>
@@ -209,7 +213,7 @@ $img = !empty($heraldica['imagem']) ? "/uploads/heraldica/" . htmlspecialchars($
         </div>
 
         <div class="heraldica-section">
-            <h2>Elementos Heráldicos</h2>
+            <h2><?= te('heraldica.elementos.titulo') ?></h2>
 
             <div class="heraldica-grid">
                 <?php foreach($elementos as $e): ?>
@@ -222,7 +226,7 @@ $img = !empty($heraldica['imagem']) ? "/uploads/heraldica/" . htmlspecialchars($
             </div>
 
             <?php if(empty($elementos)): ?>
-                <p>Ainda não existem elementos heráldicos publicados.</p>
+                <p><?= te('heraldica.elementos.vazio') ?></p>
             <?php endif; ?>
         </div>
 

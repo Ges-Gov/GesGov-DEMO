@@ -82,3 +82,16 @@ Substitui o antigo demo em `granho.185.205.244.198.nip.io`.
 - Redirecionamento HTTP → HTTPS no FastPanel (em 30/09/2026 o `http://` ainda respondia 200).
 - Password de aplicação do email em `includes/mail_config.php` (para as confirmações de inscrição).
 - Documentos e assembleia de exemplo, se se quiser mostrar essas páginas preenchidas.
+
+## Modelo novo (26/10/2026)
+
+- Passado para o modelo novo (o do Sousel, receita do `sousel/REDESIGN.md`); BD local reconstruída a partir de um dump de produção.
+- Conteúdo em `deploy/gesgov-demo_redesign.json` (só acrescenta): os 6 links úteis com logótipo (DGAL/Portal Autárquico, ANAFRE,
+  Tribunal de Contas, Finanças, Segurança Social Direta, CGA), «Ao lado das Freguesias» (cartões `apoios` com 4 áreas de serviço e as
+  imagens dos serviços), prefixo `DEMO`, galeria ligada, textos próprios do demo (botão «Contactar a GesGov», frase do rodapé).
+- **Canal de Denúncias e Transparência continuam visíveis no menu** (nos sites das Juntas estão ocultos desde 23/10): o demo mostra
+  tudo o que a plataforma faz.
+- A mensagem do Diretor Executivo não aparecia (o `index.php` só procurava um cargo com «Presidente»); o CORE passou a usar a pessoa
+  com o nome de `homepage_config.presidente_nome` quando não há Presidente.
+- Em produção há conteúdo de teste criado no backoffice por alguém da GesGov: a notícia «Teste» (16/10) e 3 documentos («Ata nº 1»,
+  «ata n 2», «Edital nº30»). Não foram mexidos.

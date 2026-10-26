@@ -1,0 +1,167 @@
+{
+  "_nota": "Redesign 26/10/2026 — GesGov Demo no modelo novo: links úteis com logótipo, «Perto de quem precisa» com as áreas de serviço da GesGov, prefixo DEMO, galeria ligada. Só acrescenta. Correr: php deploy/acrescentar_conteudo.php deploy/gesgov-demo_redesign.json [--simular]",
+  "atualizar": [
+    {
+      "tabela": "tema_config",
+      "valores": {
+        "valor": "DEMO"
+      },
+      "onde": [
+        "chave",
+        "prefixo_pedidos"
+      ]
+    },
+    {
+      "tabela": "homepage_config",
+      "valores": {
+        "mostrar_galeria": 1
+      }
+    }
+  ],
+  "inserir": [
+    {
+      "tabela": "tema_config",
+      "chave": "chave",
+      "linhas": [
+        {
+          "chave": "prefixo_pedidos",
+          "valor": "DEMO"
+        }
+      ]
+    },
+    {
+      "tabela": "links_uteis",
+      "chave": "nome",
+      "linhas": [
+        {
+          "nome": "DGAL — Portal Autárquico",
+          "url": "https://www.portalautarquico.dgal.gov.pt/",
+          "logo": "links/dgal.png",
+          "patrocinado": 0,
+          "ordem": 1,
+          "ativo": 1
+        },
+        {
+          "nome": "ANAFRE — Associação Nacional de Freguesias",
+          "url": "https://www.anafre.pt/",
+          "logo": "links/anafre.png",
+          "patrocinado": 0,
+          "ordem": 2,
+          "ativo": 1
+        },
+        {
+          "nome": "Tribunal de Contas",
+          "url": "https://www.tcontas.pt/",
+          "logo": "links/tribunal-contas.png",
+          "patrocinado": 0,
+          "ordem": 3,
+          "ativo": 1
+        },
+        {
+          "nome": "Portal das Finanças",
+          "url": "https://www.portaldasfinancas.gov.pt/",
+          "logo": "links/at.png",
+          "patrocinado": 0,
+          "ordem": 4,
+          "ativo": 1
+        },
+        {
+          "nome": "Segurança Social Direta",
+          "url": "https://app.seg-social.pt/",
+          "logo": "links/seg-social-direta.png",
+          "patrocinado": 0,
+          "ordem": 5,
+          "ativo": 1
+        },
+        {
+          "nome": "Caixa Geral de Aposentações",
+          "url": "https://www.cga.pt/",
+          "logo": "links/cga.png",
+          "patrocinado": 0,
+          "ordem": 6,
+          "ativo": 1
+        }
+      ]
+    },
+    {
+      "tabela": "cartoes_site",
+      "chave": "titulo",
+      "linhas": [
+        {
+          "grupo": "apoios",
+          "titulo": "Contabilidade Pública",
+          "texto": "SNC-AP, prestação de contas e apoio diário à contabilidade da Junta.",
+          "icone": "bi-calculator",
+          "imagem": "servico-contabilidade-publica-snc-ap.jpg",
+          "link": "/comercio.php",
+          "acao": "Ver serviços",
+          "ordem": 1,
+          "ativo": 1
+        },
+        {
+          "grupo": "apoios",
+          "titulo": "Contratação Pública",
+          "texto": "Procedimentos do Código dos Contratos Públicos, do ajuste direto ao concurso.",
+          "icone": "bi-file-earmark-text",
+          "imagem": "servico-contratacao-publica.jpg",
+          "link": "/comercio.php",
+          "acao": "Ver serviços",
+          "ordem": 2,
+          "ativo": 1
+        },
+        {
+          "grupo": "apoios",
+          "titulo": "Recursos Humanos",
+          "texto": "Procedimentos concursais, SIADAP e gestão do pessoal da autarquia.",
+          "icone": "bi-people",
+          "imagem": "servico-recursos-humanos.jpg",
+          "link": "/comercio.php",
+          "acao": "Ver serviços",
+          "ordem": 3,
+          "ativo": 1
+        },
+        {
+          "grupo": "apoios",
+          "titulo": "Consultoria Jurídica",
+          "texto": "Pareceres e apoio jurídico nas decisões do executivo e da assembleia.",
+          "icone": "bi-bank",
+          "imagem": "servico-consultoria-juridica.jpg",
+          "link": "/comercio.php",
+          "acao": "Ver serviços",
+          "ordem": 4,
+          "ativo": 1
+        }
+      ]
+    },
+    {
+      "tabela": "textos_site",
+      "chave": "chave",
+      "linhas": [
+        {
+          "chave": "inicio.apoios.kicker",
+          "valor": "Serviços GesGov"
+        },
+        {
+          "chave": "inicio.apoios.titulo",
+          "valor": "Ao lado das Freguesias"
+        },
+        {
+          "chave": "inicio.apoios.texto",
+          "valor": "As áreas em que a GesGov apoia as Juntas de Freguesia no dia a dia."
+        },
+        {
+          "chave": "inicio.presidente.botao2",
+          "valor": "Contactar a GesGov"
+        },
+        {
+          "chave": "rodape.institucional.inicio",
+          "valor": "Site de demonstração da"
+        },
+        {
+          "chave": "rodape.institucional.fim",
+          "valor": ": o site que a GesGov entrega às Juntas de Freguesia, aqui com o conteúdo da própria GesGov."
+        }
+      ]
+    }
+  ]
+}

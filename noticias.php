@@ -50,7 +50,7 @@ $heroImagem = !empty($noticias[0]['imagem'])
     inset:0;
     background:
         radial-gradient(circle at right top, rgba(255,255,255,.11), transparent 34%),
-        radial-gradient(circle at left bottom, color-mix(in srgb, var(--tema-acento, #D4AA00) 11%, transparent), transparent 28%);
+        radial-gradient(circle at left bottom, rgb(var(--ouro-rgb, 240 180 41) / .11), transparent 28%);
 }
 
 .noticias-hero-clean::after{
@@ -70,9 +70,9 @@ $heroImagem = !empty($noticias[0]['imagem'])
     display:inline-flex;
     align-items:center;
     gap:8px;
-    background:color-mix(in srgb, var(--tema-acento, #D4AA00) 14%, transparent);
-    border:1px solid color-mix(in srgb, var(--tema-acento, #D4AA00) 42%, transparent);
-    color:var(--tema-kicker-img-texto, #F0D060);
+    background:rgb(var(--ouro-rgb, 240 180 41) / .14);
+    border:1px solid rgb(var(--ouro-rgb, 240 180 41) / .42);
+    color:var(--ouro-claro, #f8d77a);
     padding:9px 15px;
     border-radius:999px;
     font-size:13px;
@@ -227,7 +227,7 @@ $heroImagem = !empty($noticias[0]['imagem'])
     display:grid;
     place-items:center;
     background:linear-gradient(135deg,#242A30,#11151B);
-    color:var(--tema-acento, #D4AA00);
+    color:var(--ouro, #C8A02E);
     font-size:54px;
     font-weight:900;
 }
@@ -282,7 +282,7 @@ $heroImagem = !empty($noticias[0]['imagem'])
 }
 
 .noticia-clean-link:hover{
-    color:var(--tema-acento, #D4AA00);
+    color:var(--ouro, #C8A02E);
 }
 
 .noticia-clean-link:hover::after{
@@ -339,7 +339,18 @@ $heroImagem = !empty($noticias[0]['imagem'])
 
 @media(max-width:760px){
     .noticias-hero-clean{
-        min-height:420px;
+        min-height:360px;
+    }
+
+    .noticias-hero-clean h1{
+        font-size:clamp(28px,8vw,40px);
+        letter-spacing:-1px;
+    }
+
+    .noticias-hero-clean p{
+        font-size:15px;
+        line-height:1.5;
+        margin:0 0 20px;
     }
 
     .noticias-clean-grid{
@@ -364,11 +375,11 @@ $heroImagem = !empty($noticias[0]['imagem'])
 
     <section class="noticias-hero-clean">
         <div class="container">
-            <span class="noticias-kicker-clean">Atualidade</span>
-            <h1>Todas as notícias</h1>
+            <span class="noticias-kicker-clean"><?= te('noticias.hero.kicker') ?></span>
+            <h1><?= te('noticias.hero.titulo') ?></h1>
             <p>
-                Acompanhe novidades, eventos, projetos e informações importantes
-                da freguesia.
+                <?= te('noticias.hero.texto') ?>
+
             </p>
         </div>
     </section>
@@ -377,10 +388,10 @@ $heroImagem = !empty($noticias[0]['imagem'])
         <div class="container">
             <div class="noticias-tools-inner">
                 <div class="news-tabs">
-                    <span class="active"><i class="bi bi-newspaper"></i> Todas as notícias</span>
-                    <span><i class="bi bi-pin-angle-fill"></i> Avisos</span>
-                    <span><i class="bi bi-calendar-event-fill"></i> Eventos</span>
-                    <span><i class="bi bi-stars"></i> Projetos</span>
+                    <span class="active"><i class="bi bi-newspaper"></i> <?= te('noticias.filtros.todas') ?></span>
+                    <span><i class="bi bi-pin-angle-fill"></i> <?= te('noticias.filtros.avisos') ?></span>
+                    <span><i class="bi bi-calendar-event-fill"></i> <?= te('noticias.filtros.eventos') ?></span>
+                    <span><i class="bi bi-stars"></i> <?= te('noticias.filtros.projetos') ?></span>
                 </div>
 
                 <div class="news-count">
@@ -423,7 +434,7 @@ $heroImagem = !empty($noticias[0]['imagem'])
                                 </p>
 
                                 <a href="/noticia.php?id=<?= (int)$n['id'] ?>" class="noticia-clean-link">
-                                    Ler mais
+                                    <?= te('noticias.lista.ler_mais') ?>
                                 </a>
                             </div>
 
@@ -456,7 +467,7 @@ $heroImagem = !empty($noticias[0]['imagem'])
             <?php else: ?>
 
                 <div class="noticias-empty-clean">
-                    Ainda não existem notícias publicadas.
+                    <?= te('noticias.vazio.texto') ?>
                 </div>
 
             <?php endif; ?>

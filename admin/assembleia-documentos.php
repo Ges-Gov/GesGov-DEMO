@@ -281,9 +281,9 @@ function buildAdminDocsUrl($overrides = []) {
 .asm-hero p{margin:0;color:#dbeafe}
 .asm-kicker{
     display:inline-flex;
-    background:color-mix(in srgb, var(--tema-acento, #D4AA00) 16%, transparent);
-    border:1px solid color-mix(in srgb, var(--tema-acento, #D4AA00) 35%, transparent);
-    color:var(--tema-kicker-img-texto, #F0D060);
+    background:rgb(var(--ouro-rgb, 240 180 41) / .16);
+    border:1px solid rgb(var(--ouro-rgb, 240 180 41) / .35);
+    color:var(--ouro-claro, #f8d77a);
     padding:8px 13px;
     border-radius:999px;
     font-size:12px;

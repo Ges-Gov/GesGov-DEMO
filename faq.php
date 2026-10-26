@@ -50,6 +50,10 @@ $faqs = $pdo->query("SELECT * FROM faqs WHERE ativo = 1 ORDER BY ordem ASC, id A
     line-height:1.75;
     margin:0;
 }
+@media(max-width:700px){
+    .faq-hero h1{font-size:clamp(26px,7vw,38px);letter-spacing:-1px;}
+    .faq-hero p{font-size:15px;line-height:1.5;}
+}
 .faq-shell{margin-top:-52px;position:relative;z-index:5;}
 .faq-list{
     max-width:880px;
@@ -123,9 +127,9 @@ $faqs = $pdo->query("SELECT * FROM faqs WHERE ativo = 1 ORDER BY ordem ASC, id A
 
 <section class="faq-hero">
     <div class="container">
-        <span class="faq-kicker">Ajuda</span>
-        <h1>Perguntas Frequentes</h1>
-        <p>Respostas rápidas às dúvidas mais comuns sobre os serviços da Junta de Freguesia.</p>
+        <span class="faq-kicker"><?= te('faq.hero.kicker') ?></span>
+        <h1><?= te('faq.hero.titulo') ?></h1>
+        <p><?= te('faq.hero.texto') ?></p>
     </div>
 </section>
 
@@ -147,7 +151,7 @@ $faqs = $pdo->query("SELECT * FROM faqs WHERE ativo = 1 ORDER BY ordem ASC, id A
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
-            <div class="faq-empty">Ainda não existem perguntas frequentes publicadas.</div>
+            <div class="faq-empty"><?= te('faq.vazio.texto') ?></div>
         <?php endif; ?>
 
     </div>
