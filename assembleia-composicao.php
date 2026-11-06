@@ -256,7 +256,7 @@ if ($totalLugares > 0 && $comLugar) {
                                 <path d="M <?= $pt($a - $g, $Ranel) ?> A <?= $Ranel ?> <?= $Ranel ?> 0 0 1 <?= $pt($b + $g, $Ranel) ?>" stroke="<?= $h($cor) ?>" data-tip="<?= $h($dica) ?>"></path>
                             <?php endforeach; ?>
                         </g>
-                        <?php if ($aMaioria !== null): ?>
+                        <?php if ($aMaioria !== null && $comMaioria): /* 06/11/2026: sem maioria absoluta, sem linha nem legenda */ ?>
                             <g class="asm-maioria" aria-hidden="true">
                                 <line x1="<?= round($cx + cos($aMaioria) * ($Ranel + 16), 1) ?>" y1="<?= round($cy - sin($aMaioria) * ($Ranel + 16), 1) ?>" x2="<?= round($cx + cos($aMaioria) * ($R + 44), 1) ?>" y2="<?= round($cy - sin($aMaioria) * ($R + 44), 1) ?>"></line>
                             </g>
@@ -277,7 +277,7 @@ if ($totalLugares > 0 && $comLugar) {
                     <ul class="asm-hemi__chave">
                         <li><span class="asm-chave-lugar" aria-hidden="true"></span> Um círculo = um lugar<?= $umaFila ? ' (com as iniciais de quem já está publicado)' : '' ?></li>
                         <li><span class="asm-chave-anel" aria-hidden="true"></span> Anel interior = percentagem de votos</li>
-                        <?php if ($aMaioria !== null): ?><li><span class="asm-chave-maioria" aria-hidden="true"></span> Linha = maioria absoluta (<?= $maioria ?> lugares)<?= $comMaioria ? ' — o ' . $h($comMaioria['sigla']) . ' tem maioria' : ' — nenhuma lista tem maioria' ?></li><?php endif; ?>
+                        <?php if ($aMaioria !== null && $comMaioria): /* 06/11/2026: sem maioria absoluta, sem linha nem legenda */ ?><li><span class="asm-chave-maioria" aria-hidden="true"></span> Linha = maioria absoluta (<?= $maioria ?> lugares)<?= $comMaioria ? ' — o ' . $h($comMaioria['sigla']) . ' tem maioria' : ' — nenhuma lista tem maioria' ?></li><?php endif; ?>
                     </ul>
                 </div>
                 <div>
