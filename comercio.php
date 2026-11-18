@@ -620,7 +620,7 @@ $heroImagem = !empty($todosComercio[0]['imagem'])
 
 </style>
 
-<main class="comercio-page-insane">
+<div class="comercio-page-insane">
 
     <section class="comercio-hero-insane">
         <div class="container">
@@ -634,10 +634,10 @@ $heroImagem = !empty($todosComercio[0]['imagem'])
                     </p>
                 </div>
 
-                <aside class="comercio-hero-stat">
+                <div class="comercio-hero-stat">
                     <strong><?= (int)$total ?></strong>
                     <span><?= te('comercio.hero.contagem') ?></span>
-                </aside>
+                </div>
             </div>
         </div>
     </section>
@@ -843,7 +843,7 @@ $heroImagem = !empty($todosComercio[0]['imagem'])
 
     </section>
 
-</main>
+</div>
 
 
 
