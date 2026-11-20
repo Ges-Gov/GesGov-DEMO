@@ -82,7 +82,7 @@ if (temaConfig('sugestoes_ativo', '0') === '1') {
 [$menuAdmin] = menuAdminDefinicao(compact('badgePedidos', 'badgeRequerimentos', 'badgeFaturacao', 'badgeMensagens', 'badgeReservas', 'badgeSugestoes'));
 [$menuVisivel, $menuAtual, $menuGrupoAtual] = menuAdminPreparar($menuAdmin, (string)$adminActive);
 
-$adminPapeis = ['admin' => 'Administrador', 'operador' => 'Operador', 'vogal' => 'Vogal',
+$adminPapeis = ['admin' => 'Administrador', 'operador' => 'Assistente operacional', 'vogal' => 'Vogal',
                 'presidente_assembleia' => 'Presidente da Assembleia', 'admin_denuncias' => 'Canal de Denúncias'];
 $adminPapel = $adminPapeis[$adminTipo ?? 'admin'] ?? ucfirst((string)($adminTipo ?? 'admin'));
 $adminIniciais = (function (string $n): string {
